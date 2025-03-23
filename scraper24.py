@@ -321,13 +321,13 @@ async def main():
             page.set_default_timeout(31536000)
             
             await page.goto(f"""{url}""")
-            
+            print(f"Range: {rg[0],rg[1]}")
             for ii in range(rg[0],rg[1]):
                 for i in range(1,24):
                 
                     await scroll_and_scrape(page)
             
-                await page.goto(f"""https://www.property24.com/for-sale/advanced-search/results/p{ii+1}?sp=pid%3d1%2c{five}%2c{four}%2c{two}%2c{five}%2c{three}%2c2%2c{four}""")
+                await page.goto(f"""https://www.property24.com/for-sale/gauteng/1/p{ii+1}""")
 
                
                         
@@ -338,22 +338,27 @@ async def main():
             
             
               
-    num_scrapers = 1
-    interval = 33
-    # Generate URLs with page numbers increasing in intervals of 33
-    pooled = [
-        f"https://www.property24.com/for-sale/advanced-search/results/p{x}?sp=pid%3d1%2c{five}%2c{four}%2c{two}%2c{five}%2c{three}%2c2%2c{four}"
-        for x in range(32, num_scrapers * interval, interval) 
-    ]
+    num_scrapers = 5
+    interval = 5
+    pooled = []
+    start = 1
+    for i in range(num_scrapers):
+        end = (i + 1) * interval
+        pooled.append(f"https://www.property24.com/for-sale/gauteng/1/p{start}")
+        start = end
+  
     
+
+
     urls = [ 
-        ( pooled[x],f"context_{x+1}",((x+(x*interval))+1,interval+(interval*x))) for x in range(0,len(pooled))
+        ( pooled[x],f"context_{x+1}",
+         (interval*(x+1)-interval,interval*(x+1))) for x in range(0,len(pooled))
 
         ]
-    
+    print(pooled)
     tasks = [asyncio.create_task(run_context(*args)) for args in urls]
     await asyncio.gather(*tasks)
-    with open("Property24Data.json", "w") as file:
+    with open("gauteng.json", "w") as file:
         json.dump(dataBun, file, indent=4)
    
         
