@@ -106,7 +106,7 @@ async def scrapeListing(page:Page,start):
         
     except :
         print("Read More, button not found or clickable.")
-        descr =  await page.locator(".js_readMoreContainer").all_inner_texts()
+        
     try: 
         headings= await page.query_selector_all(".collapsed")
         for i in headings:
