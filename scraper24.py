@@ -338,7 +338,7 @@ async def main():
             
             
               
-    num_scrapers = 5
+    num_scrapers = 3
     interval = 5
     pooled = []
     start = 1
@@ -351,8 +351,8 @@ async def main():
 
 
     urls = [ 
-        ( pooled[x],f"context_{x+1}",
-         (interval*(x+1)-interval,interval*(x+1))) for x in range(0,len(pooled))
+        ( pooled[x-1],f"context_{x+1}",
+         (interval*(x+1)-interval,interval*(x+1))) for x in range(1,len(pooled)+1)
 
         ]
     print(pooled)
