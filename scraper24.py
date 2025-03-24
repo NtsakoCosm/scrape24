@@ -101,12 +101,16 @@ async def scrapeListing(page:Page,start):
     properties = {}
     grouped= {}
     try:
-        await page.click('.js_readMoreLinkText',timeout=500)
-        descr =  await page.locator(".js_readMoreContainer").all_inner_texts()
+        
+        await page.get_by_text("Read More").click(timeout=250)
+        
+        descr =  await page.locator(".js_readMoreText.p24_readMoreText").all_inner_texts()
         
     except :
-        print("Read More, button not found or clickable.")
-        
+        try:
+            descr =  await page.locator(".js_readMoreContainer").all_inner_texts()
+        except:
+            descr =  "None Found"
     try: 
         headings= await page.query_selector_all(".collapsed")
         for i in headings:
@@ -117,8 +121,8 @@ async def scrapeListing(page:Page,start):
     except:
         pass
     try :
-        #await asyncio.sleep(3)
-        await page.locator("#P24_pointsOfInterest").scroll_into_view_if_needed(timeout=1000)
+        
+        await page.locator("#P24_pointsOfInterest").scroll_into_view_if_needed(timeout=500)
         pois = page.locator("#P24_pointsOfInterest").get_by_text("View more")
             
         # Check if elements exist
@@ -135,7 +139,7 @@ async def scrapeListing(page:Page,start):
                 cleaned = clean_text(block)
                 grouped = group_data(cleaned)
     except :
-        print("POIS ERROR")
+        pass
 
 
     
@@ -263,7 +267,7 @@ async def scroll_and_scrape(page: Page, x=460, y=383, step=100, delay=0.1,start=
                 pass
                 #Continue on
             else:
-                print(f"Valid new link found: {url}")
+                
                 with scraped_linksLock:
                     scraped_links.add(url)  # Mark this URL as scraped.
                 
@@ -303,12 +307,7 @@ async def scroll_and_scrape(page: Page, x=460, y=383, step=100, delay=0.1,start=
 
 
 async def main():
-    one = random.randint(1, 2)
-    two = random.randint(2, 4)
-    three = random.randint(4, 6)
-    four = random.randint(6, 8)
-    five = random.randint(8, 10)
-    six = random.randint(10, 12)
+   
     
     async def run_context(url, context_name, rg =(1,32),headless=False):
         async with async_playwright() as p:
@@ -337,9 +336,9 @@ async def main():
             
             
             
-              
-    num_scrapers = 3
-    interval = 5
+    
+    num_scrapers = 4
+    interval = 13
     pooled = []
     start = 1
     for i in range(num_scrapers):
@@ -352,7 +351,7 @@ async def main():
 
     urls = [ 
         ( pooled[x-1],f"context_{x+1}",
-         (interval*(x+1)-interval,interval*(x+1))) for x in range(1,len(pooled)+1)
+         ((x*interval)-interval+1,interval*x)) for x in range(1,len(pooled)+1)
 
         ]
     print(pooled)
